@@ -8,7 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update
 
 # Install essentials
-RUN apt install -y apt-utils lsb-release build-essential git cmake cmake-curses-gui libedit-dev libxml2-dev
+RUN apt install -y apt-utils sudo psmisc lsb-release tmux nano wget curl \
+                   build-essential git cmake cmake-curses-gui libedit-dev libxml2-dev
+
+# Install graphics
+RUN apt install -y xfce4 xfce4-goodies xvfb x11vnc firefox
 
 # Install Java
 RUN apt install -y default-jdk
@@ -18,11 +22,14 @@ RUN apt install -y octave epstool transfig
 
 # Install markserv
 RUN apt install -y nodejs npm
-RUN npm i -g markserv
+RUN npm install --global markserv
 
 # Install jupyter
 RUN apt install -y python python-dev python-pip ipython
 RUN pip install jupyter
+
+# Install terminator
+RUN apt install -y terminator
 
 # Install yarp dependencies
 RUN echo "deb http://www.icub.org/ubuntu `lsb_release -cs` contrib/science" > /etc/apt/sources.list.d/icub.list
@@ -39,48 +46,76 @@ RUN git clone https://github.com/robotology/ycm.git -b $BRANCH
 RUN cd ycm && mkdir build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
-RUN rm -rf ycm
+RUN rm -Rf ycm
 
 # Build robot-testing
 RUN git clone https://github.com/robotology/robot-testing.git -b $BRANCH
 RUN cd robot-testing && mkdir build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
-RUN rm -rf robot-testing
+RUN rm -Rf robot-testing
 
 # Build yarp
 RUN git clone https://github.com/robotology/yarp.git -b $BRANCH
 RUN cd yarp && mkdir build && cd build && \
     cmake .. \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-    -DYARP_COMPILE_RTF_ADDONS=ON \
-    -DCREATE_LIB_MATH=ON \
-    -DCREATE_GUIS=OFF \
+    -DYARP_COMPILE_libYARP_math=ON \
+    -DYARP_COMPILE_GUIS=ON \
     -DYARP_COMPILE_DEVICE_PLUGINS=OFF && \
     make install
-RUN rm -rf yarp
+RUN rm -Rf yarp
 
 # Build icub-main
 RUN git clone https://github.com/robotology/icub-main.git -b $BRANCH
 RUN cd icub-main && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \ 
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+    -DENABLE_icubmod_cartesiancontrollerserver=ON \
+    -DENABLE_icubmod_cartesiancontrollerclient=ON \
+    -DENABLE_icubmod_gazecontrollerclient=ON && \
     make install
-RUN rm -rf icub-main
+RUN rm -Rf icub-main
 
 # Build icub-contrib-common
 RUN git clone https://github.com/robotology/icub-contrib-common.git
 RUN cd icub-contrib-common && mkdir build && cd build && \
     cmake .. && \
     make install
-RUN rm -rf icub-contrib-common
+RUN rm -Rf icub-contrib-common
 
-# Ports management
-EXPOSE 8080 8888 10000/tcp 10000/udp
+ARG GITHUB_TOKEN={token}
 
-# Setup an additional entrypoint script
-COPY entrypoint.sh /usr/sbin/entrypoint.sh
-RUN chmod 755 /usr/sbin/entrypoint.sh
-ENTRYPOINT ["/usr/sbin/entrypoint.sh"]
+# Build audition-projects-helpers
+RUN git config --global url."https://$GITHUB_TOKEN:@github.com/".insteadOf "https://github.com/"
+RUN git clone https://github.com/dic-iit/audition-projects-helpers.git
+RUN git config --global --remove-section url."https://$GITHUB_TOKEN:@github.com/"
+RUN cd audition-projects-helpers && mkdir build && cd build && \
+    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    make install
+RUN rm -Rf audition-projects-helpers
 
+# Set environmental variable for display
+ENV DISPLAY=:1
+
+# Make default contexts discoverable by yarp
+ENV YARP_DATA_DIRS=/usr/local/share/yarp:/usr/local/share/iCub:/usr/local/share/ICUBcontrib
+
+# Make dynamic libraries discoverable
+ENV LD_LIBRARY_PATH=/usr/local/lib/yarp:/usr/local/lib/robottestingframework
+
+# Manage markserv port
+EXPOSE 8080
+
+# Manage jupyter port
+EXPOSE 8888
+
+# Manager x11vnc port
+EXPOSE 5901
+
+# Manage yarp port
+EXPOSE 10000/tcp 10000/udp
+
+# Launch bash from /projects
 WORKDIR /projects
 CMD ["bash"]

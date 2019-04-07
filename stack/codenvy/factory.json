@@ -1,0 +1,93 @@
+{
+    "v": "4.0",
+    "visibility": "public",
+    "name": "technical-evaluation-factory",
+    "workspace": {
+        "environments": {
+            "wss": {
+                "machines": {
+                    "dev-machine": {
+                        "attributes": {
+                            "memoryLimitBytes": "1073741824"
+                        },
+                        "servers": {
+                            "jupyter": {
+                                "port": "8888",
+                                "properties": {},
+                                "protocol": "http"
+                            },
+                            "markserv": {
+                                "port": "8080",
+                                "properties": {},
+                                "protocol": "http"
+                            },
+                            "x11vnc": {
+                                "port": "5901",
+                                "properties": {},
+                                "protocol": "http"
+                            }
+                        },
+                        "agents": [
+                            "org.eclipse.che.ws-agent",
+                            "org.eclipse.che.ssh",
+                            "org.eclipse.che.terminal",
+                            "org.eclipse.che.exec"
+                        ]
+                    }
+                },
+                "recipe": {
+                    "type": "dockerfile",
+                    "content": "FROM pattacini/technical-evaluation-stack:codenvy",
+                    "contentType": "text/x-dockerfile"
+                }
+            }
+        },
+        "defaultEnv": "wss",
+        "projects": [{
+            "links": [],
+            "name": "technical-evaluation",
+            "attributes": {
+                "contribute_to_branch": [
+                    "master"
+                ],
+                "commands": [
+                    "{\"commandLine\":\"Xvfb :1 -screen 0 1366x768x16 &\\r\\nstartxfce4 &\\r\\nx11vnc -display :1 -N -forever &\", \"name\":\"X11 server\", \"attributes\":{\"previewUrl\":\"${server.port.5901}\", \"goal\":\"Common\"}, \"type\":\"custom\"}"
+                ]
+            },
+            "type": "cpp",
+            "source": {
+                "location": "https://github.com/pattacini/technical-evaluation",
+                "type": "github",
+                "parameters": {}
+            },
+            "path": "/technical-evaluation",
+            "problems": [],
+            "mixins": [
+                "pullrequest"
+            ]
+        }],
+        "name": "technical-evaluation",
+        "commands": [{
+                "commandLine": "markserv -a 0.0.0.0 -p 8080 &",
+                "name": "Markdown server",
+                "attributes": {
+                    "previewUrl": "${server.port.8080}"
+                },
+                "type": "custom"
+            },
+            {
+                "commandLine": "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password='' &",
+                "name": "Jupyter server",
+                "attributes": {
+                    "previewUrl": "${server.port.8888}"
+                },
+                "type": "custom"
+            }
+        ],
+        "links": []
+    },
+    "creator": {
+        "name": "Ugo Pattacini",
+        "email": "ugo.pattacini@iit.it"
+    }
+}

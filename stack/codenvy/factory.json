@@ -73,10 +73,10 @@
         }],
         "name": "technical-evaluation",
         "commands": [{
-                "commandLine": "markserv -a 0.0.0.0 -p 8080 &",
+                "commandLine": "markserv --browser false -a 0.0.0.0 -p 8080 &",
                 "name": "Markdown server",
                 "attributes": {
-                    "previewUrl": "${server.port.8080}"
+                    "previewUrl": "http://${server.port.8080}"
                 },
                 "type": "custom"
             },
@@ -84,15 +84,15 @@
                 "commandLine": "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password='' &",
                 "name": "Jupyter server",
                 "attributes": {
-                    "previewUrl": "${server.port.8888}"
+                    "previewUrl": "http://${server.port.8888}"
                 },
                 "type": "custom"
             },
             {
-                "commandLine": "/root/noVNC/utils/launch.sh --web /root/noVNC/ --listen 6080 --vnc 0.0.0.0:5901",
+                "commandLine": "/root/noVNC/utils/launch.sh --web /root/noVNC/ --listen 6080 --vnc 0.0.0.0:5901 &",
                 "name": "noVNC server",
                 "attributes": {
-                    "previewUrl": "${server.port.6080}/vnc.html"
+                    "previewUrl": "http://${server.port.6080}/vnc.html"
                 },
                 "type": "custom"
             }

@@ -7,5 +7,7 @@ ports:
 - port: 6080
   onOpen: notify
 tasks:
-- command: cd /workspace && markserv -a 0.0.0.0 -p 8080 &
-- command: cd /workspace && jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password='' &  
+- command: start-markserv.sh
+- command: start-jupyter.sh
+- command: start-vnc-session.sh
+- command: tmux

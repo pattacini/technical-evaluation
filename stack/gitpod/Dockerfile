@@ -1,4 +1,4 @@
-FROM gitpod/workspace-full-vnc:latest
+FROM ubuntu:latest
 LABEL maintainer="ugo.pattacini@iit.it"
 
 # Non-interactive installation mode
@@ -8,11 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update
 
 # Install essentials
-RUN apt install -y apt-utils psmisc lsb-release tmux nano wget curl \
+RUN apt install -y apt-utils sudo psmisc lsb-release tmux nano wget curl \
                    build-essential git cmake cmake-curses-gui libedit-dev libxml2-dev
 
 # Install graphics
-RUN apt install -y xfce4 xfce4-goodies firefox
+RUN apt install -y xfce4 xfce4-goodies xvfb x11vnc firefox
 
 # Install Java
 RUN apt install -y default-jdk
@@ -21,20 +21,27 @@ RUN apt install -y default-jdk
 RUN apt install -y octave epstool transfig
 
 # Install markserv
-RUN apt install -y nodejs-dev node-gyp libssl1.0-dev nodejs npm
+RUN apt install -y nodejs npm
 RUN npm install --global markserv
 
 # Install jupyter
 RUN apt install -y python python-dev python-pip ipython
-RUN sudo -H pip install jupyter
+RUN pip install jupyter
 
 # Install terminator
 RUN apt install -y terminator
 
+# Install websockify
+RUN git clone https://github.com/novnc/websockify.git /opt/websockify && \
+    cd /opt/websockify && \
+    python setup.py install
+
+# Clone noVNC
+RUN git clone https://github.com/novnc/noVNC.git /opt/novnc
+RUN echo "<html><head><meta http-equiv=\"Refresh\" content=\"0; url=vnc.html\"></head></html>" > /opt/novnc/index.html
+
 # Install yarp dependencies
-# gitpod/workspace-full-vnc is based on cosmic and we don't have cosmic release of icub-common yet!
-# as fallback we go for bionic
-RUN echo "deb http://www.icub.org/ubuntu bionic contrib/science" > /etc/apt/sources.list.d/icub.list
+RUN echo "deb http://www.icub.org/ubuntu `lsb_release -cs` contrib/science" > /etc/apt/sources.list.d/icub.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57A5ACB6110576A6
 RUN apt update
 RUN apt install -y icub-common
@@ -80,21 +87,23 @@ RUN cd icub-main && mkdir build && cd build && \
 RUN rm -Rf icub-main
 
 # Switch to gitpod user
+RUN useradd -l -u 33333 -G sudo -md /home/gitpod -s /bin/bash -p gitpod gitpod && \
+    # passwordless sudo for users in the 'sudo' group
+    sed -i.bkp -e 's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' /etc/sudoers
 USER gitpod
 
 # Build icub-contrib-common
-RUN mkdir /home/gitpod/iCubContrib
-RUN cd /home/gitpod && \
-    git clone https://github.com/robotology/icub-contrib-common.git && \
-    cd icub-contrib-common && mkdir build && cd build && \
+WORKDIR /home/gitpod
+RUN mkdir iCubContrib
+RUN git clone https://github.com/robotology/icub-contrib-common.git
+RUN cd icub-contrib-common && mkdir build && cd build && \
     cmake .. \
     -DCMAKE_INSTALL_PREFIX=/home/gitpod/iCubContrib && \
     make install
-RUN rm -Rf /home/gitpod/icub-contrib-common
+RUN rm -Rf icub-contrib-common
 ENV ICUBcontrib_DIR=/home/gitpod/iCubContrib
-RUN echo "export PATH=$PATH:/home/gitpod/iCubContrib/bin" >> ~/.bashrc
 
-ARG GITHUB_TOKEN=${token}
+ARG GITHUB_TOKEN={token}
 
 # Build audition-projects-helpers
 RUN git config --global url."https://$GITHUB_TOKEN:@github.com/".insteadOf "https://github.com/"
@@ -105,23 +114,43 @@ RUN cd audition-projects-helpers && mkdir build && cd build && \
     make install
 RUN rm -Rf audition-projects-helpers
 
+# Set up .bashrc
+RUN echo "export PATH=$PATH:/home/gitpod/iCubContrib/bin" >> ~/.bashrc
+
 # Switch back to root
 USER root
 
-# Run graphics environment
-RUN echo "startxfce4 &" >> ~/.bashrc
-
-# Make default contexts discoverable by yarp
+# Set environmental variables
+ENV DISPLAY=:1
 ENV YARP_DATA_DIRS=/usr/local/share/yarp:/usr/local/share/iCub:/home/gitpod/iCubContrib/share/ICUBcontrib
-
-# Make dynamic libraries discoverable
 ENV LD_LIBRARY_PATH=/usr/local/lib/yarp:/usr/local/lib/robottestingframework
+
+# Set up script to launch markserv
+RUN echo "cd /workspace && markserv --browser false -a 0.0.0.0 -p 8080 &" >> /usr/bin/start-markserv.sh
+RUN chmod +x /usr/bin/start-markserv.sh
+
+# Set up script to launch jupyter
+RUN echo "cd /workspace && jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password='' &" >> /usr/bin/start-jupyter.sh
+RUN chmod +x /usr/bin/start-jupyter.sh
+
+# Set up script to launch graphics and vnc
+RUN echo "Xvfb :1 -screen 0 1366x768x16 &" >> /usr/bin/start-vnc-session.sh
+RUN echo "startxfce4 &" >> /usr/bin/start-vnc-session.sh
+RUN echo "x11vnc -display :1 -N -forever &" >> /usr/bin/start-vnc-session.sh
+RUN echo "/opt/novnc/utils/launch.sh --web /opt/novnc --vnc 0.0.0.0:5901 --listen 6080 &" >> /usr/bin/start-vnc-session.sh
+RUN chmod +x /usr/bin/start-vnc-session.sh
 
 # Manage markserv port
 EXPOSE 8080
 
 # Manage jupyter port
 EXPOSE 8888
+
+# Manage x11vnc port
+EXPOSE 5901
+
+# Manage noVNC port
+EXPOSE 6080
 
 # Manage yarp port
 EXPOSE 10000/tcp 10000/udp

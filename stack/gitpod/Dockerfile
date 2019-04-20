@@ -11,6 +11,9 @@ RUN apt update
 RUN apt install -y apt-utils psmisc lsb-release tmux nano wget curl \
                    build-essential git cmake cmake-curses-gui libedit-dev libxml2-dev
 
+# Install graphics
+RUN apt install -y xfce4 xfce4-goodies firefox
+
 # Install Java
 RUN apt install -y default-jdk
 
@@ -24,6 +27,9 @@ RUN npm install --global markserv
 # Install jupyter
 RUN apt install -y python python-dev python-pip ipython
 RUN sudo -H pip install jupyter
+
+# Install terminator
+RUN apt install -y terminator
 
 # Install yarp dependencies
 # gitpod/workspace-full-vnc is based on cosmic and we don't have cosmic release of icub-common yet!
@@ -101,6 +107,9 @@ RUN rm -Rf audition-projects-helpers
 
 # Switch back to root
 USER root
+
+# Run graphics environment
+RUN echo "startxfce4 &" >> ~/.bashrc
 
 # Make default contexts discoverable by yarp
 ENV YARP_DATA_DIRS=/usr/local/share/yarp:/usr/local/share/iCub:/home/gitpod/iCubContrib/share/ICUBcontrib

@@ -31,6 +31,14 @@ RUN pip install jupyter
 # Install terminator
 RUN apt install -y terminator
 
+# Install websockify
+RUN git clone https://github.com/novnc/websockify.git /root/websockify && \
+    cd /root/websockify && \
+    python setup.py install
+
+# Clone noVNC
+RUN git clone https://github.com/novnc/noVNC.git /root/noVNC
+
 # Install yarp dependencies
 RUN echo "deb http://www.icub.org/ubuntu `lsb_release -cs` contrib/science" > /etc/apt/sources.list.d/icub.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57A5ACB6110576A6
@@ -110,8 +118,11 @@ EXPOSE 8080
 # Manage jupyter port
 EXPOSE 8888
 
-# Manager x11vnc port
+# Manage x11vnc port
 EXPOSE 5901
+
+# Manage noVNC port
+EXPOSE 6080
 
 # Manage yarp port
 EXPOSE 10000/tcp 10000/udp

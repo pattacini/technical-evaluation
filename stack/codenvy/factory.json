@@ -25,6 +25,11 @@
                                 "port": "5901",
                                 "properties": {},
                                 "protocol": "http"
+                            },
+                            "noVNC": {
+                                "port": "6080",
+                                "properties": {},
+                                "protocol": "http"
                             }
                         },
                         "agents": [
@@ -80,6 +85,14 @@
                 "name": "Jupyter server",
                 "attributes": {
                     "previewUrl": "${server.port.8888}"
+                },
+                "type": "custom"
+            },
+            {
+                "commandLine": "/root/noVNC/utils/launch.sh --web /root/noVNC/ --listen 6080 --vnc 0.0.0.0:5901",
+                "name": "noVNC server",
+                "attributes": {
+                    "previewUrl": "${server.port.6080}/vnc.html"
                 },
                 "type": "custom"
             }

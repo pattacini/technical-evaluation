@@ -74,6 +74,7 @@ RUN cd yarp && mkdir build && cd build && \
     -DYARP_COMPILE_GUIS=ON \
     -DYARP_COMPILE_DEVICE_PLUGINS=OFF && \
     make install
+RUN cp yarp/scripts/yarp_completion /etc/bash_completion.d/.
 RUN rm -Rf yarp
 
 # Build icub-main

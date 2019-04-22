@@ -106,7 +106,7 @@ RUN cd icub-contrib-common && mkdir build && cd build && \
 RUN rm -Rf icub-contrib-common
 ENV ICUBcontrib_DIR=/home/gitpod/iCubContrib
 
-ARG GITHUB_TOKEN={token}
+ARG GITHUB_TOKEN
 
 # Build audition-projects-helpers
 RUN git config --global url."https://$GITHUB_TOKEN:@github.com/".insteadOf "https://github.com/"

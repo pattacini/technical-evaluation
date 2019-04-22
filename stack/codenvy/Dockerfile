@@ -95,7 +95,7 @@ RUN cd icub-contrib-common && mkdir build && cd build && \
     make install
 RUN rm -Rf icub-contrib-common
 
-ARG GITHUB_TOKEN={token}
+ARG GITHUB_TOKEN
 
 # Build audition-projects-helpers
 RUN git config --global url."https://$GITHUB_TOKEN:@github.com/".insteadOf "https://github.com/"

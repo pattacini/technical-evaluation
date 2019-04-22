@@ -9,7 +9,7 @@ RUN apt update
 
 # Install essentials
 RUN apt install -y apt-utils sudo psmisc lsb-release tmux nano wget curl \
-                   build-essential git cmake cmake-curses-gui libedit-dev libxml2-dev
+                   build-essential git gitk cmake cmake-curses-gui libedit-dev libxml2-dev
 
 # Install graphics
 RUN apt install -y xfce4 xfce4-goodies xvfb x11vnc firefox
@@ -53,14 +53,16 @@ ARG BUILD_TYPE=Release
 # Build ycm
 RUN git clone https://github.com/robotology/ycm.git -b $BRANCH
 RUN cd ycm && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
 RUN rm -Rf ycm
 
 # Build robot-testing
 RUN git clone https://github.com/robotology/robot-testing.git -b $BRANCH
 RUN cd robot-testing && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
 RUN rm -Rf robot-testing
 
@@ -110,11 +112,13 @@ RUN git config --global url."https://$GITHUB_TOKEN:@github.com/".insteadOf "http
 RUN git clone https://github.com/dic-iit/audition-projects-helpers.git
 RUN git config --global --remove-section url."https://$GITHUB_TOKEN:@github.com/"
 RUN cd audition-projects-helpers && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
 RUN rm -Rf audition-projects-helpers
 
 # Set up .bashrc
+RUN echo "PS1='\[\e]0;\u \w\a\]\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '" >> ~/.bashrc
 RUN echo "export PATH=$PATH:/home/gitpod/iCubContrib/bin" >> ~/.bashrc
 
 # Switch back to root

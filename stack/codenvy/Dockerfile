@@ -9,7 +9,7 @@ RUN apt update
 
 # Install essentials
 RUN apt install -y apt-utils sudo psmisc lsb-release tmux nano wget curl \
-                   build-essential git cmake cmake-curses-gui libedit-dev libxml2-dev
+                   build-essential git gitk cmake cmake-curses-gui libedit-dev libxml2-dev
 
 # Install graphics
 RUN apt install -y xfce4 xfce4-goodies xvfb x11vnc firefox
@@ -32,12 +32,12 @@ RUN pip install jupyter
 RUN apt install -y terminator
 
 # Install websockify
-RUN git clone https://github.com/novnc/websockify.git /root/websockify && \
-    cd /root/websockify && \
+RUN git clone https://github.com/novnc/websockify.git /opt/websockify && \
+    cd /opt/websockify && \
     python setup.py install
 
 # Clone noVNC
-RUN git clone https://github.com/novnc/noVNC.git /root/noVNC
+RUN git clone https://github.com/novnc/noVNC.git /opt/novnc
 
 # Install yarp dependencies
 RUN echo "deb http://www.icub.org/ubuntu `lsb_release -cs` contrib/science" > /etc/apt/sources.list.d/icub.list
@@ -52,14 +52,16 @@ ARG BUILD_TYPE=Release
 # Build ycm
 RUN git clone https://github.com/robotology/ycm.git -b $BRANCH
 RUN cd ycm && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
 RUN rm -Rf ycm
 
 # Build robot-testing
 RUN git clone https://github.com/robotology/robot-testing.git -b $BRANCH
 RUN cd robot-testing && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
 RUN rm -Rf robot-testing
 
@@ -99,17 +101,17 @@ RUN git config --global url."https://$GITHUB_TOKEN:@github.com/".insteadOf "http
 RUN git clone https://github.com/dic-iit/audition-projects-helpers.git
 RUN git config --global --remove-section url."https://$GITHUB_TOKEN:@github.com/"
 RUN cd audition-projects-helpers && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE && \
     make install
 RUN rm -Rf audition-projects-helpers
 
-# Set environmental variable for display
+# Set up .bashrc
+RUN echo "PS1='\[\e]0;\u \w\a\]\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '" >> ~/.bashrc
+
+# Set environmental variables
 ENV DISPLAY=:1
-
-# Make default contexts discoverable by yarp
 ENV YARP_DATA_DIRS=/usr/local/share/yarp:/usr/local/share/iCub:/usr/local/share/ICUBcontrib
-
-# Make dynamic libraries discoverable
 ENV LD_LIBRARY_PATH=/usr/local/lib/yarp:/usr/local/lib/robottestingframework
 
 # Manage markserv port

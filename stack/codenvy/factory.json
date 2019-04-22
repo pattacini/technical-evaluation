@@ -89,7 +89,7 @@
                 "type": "custom"
             },
             {
-                "commandLine": "/root/noVNC/utils/launch.sh --web /root/noVNC/ --listen 6080 --vnc 0.0.0.0:5901 &",
+                "commandLine": "/opt/novnc/utils/launch.sh --web /opt/novnc/ --listen 6080 --vnc 0.0.0.0:5901 &",
                 "name": "noVNC server",
                 "attributes": {
                     "previewUrl": "http://${server.port.6080}/vnc.html"

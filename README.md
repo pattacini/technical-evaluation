@@ -8,7 +8,7 @@ Please, follow the instructions
 Do your best and good luck 🤞
 
 ### Create the workspace
-If you're not already done with that, you can create the workspace in two cloud IDE's:
+If you're not already done with that, you can create the workspace in two diverse cloud IDE's:
 
 [![Codenvy](https://img.shields.io/badge/-Open%20in%20Codenvy-brightgreen.svg?style=for-the-badge)](http://tiny.cc/iit-codenvy-factory)
 

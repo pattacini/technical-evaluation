@@ -4,6 +4,8 @@ ports:
   onOpen: notify
 - port: 8888
   onOpen: notify
+- port: 5901
+  onOpen: notify
 - port: 6080
   onOpen: notify
 - port: 10000-20000

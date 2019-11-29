@@ -10,7 +10,7 @@ projects:
 components:
   - alias: theia-editor
     type: cheEditor
-    id: eclipse/che-theia/next
+    id: eclipse/che-theia/latest
   - alias: docker
     type: dockerimage
     image: 'pattacini/technical-evaluation-stack:eclipse-che'

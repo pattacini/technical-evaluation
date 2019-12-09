@@ -11,3 +11,6 @@ Do your best and good luck 🤞
 If you're not already done with that, you can create the workspace by clicking on the following badge:
 
 [![Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/pattacini/technical-evaluation)
+
+##### Notes
+:warning: This workspace has **No GitHub credentials enabled** :octocat:

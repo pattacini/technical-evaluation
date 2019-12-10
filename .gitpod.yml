@@ -12,6 +12,7 @@ ports:
   onOpen: ignore
 workspaceLocation: "."
 tasks:
+- init: init-icubcontrib.sh
 - command: start-markserv.sh
 - command: start-jupyter.sh
 - command: start-vnc-session.sh

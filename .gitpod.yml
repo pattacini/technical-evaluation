@@ -21,4 +21,4 @@ tasks:
     git config --global --unset-all user.email &&
     git config --global --unset-all credential.helper &&
     gp open /workspace/technical-evaluation/README.md
--command: gp url
+- command: gp url

@@ -13,4 +13,4 @@ If you're not already done with that, you can create the workspace by clicking o
 [![Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/pattacini/technical-evaluation)
 
 ##### Notes
-:warning: This workspace has **No GitHub credentials enabled** :octocat:
+⚠ This workspace has **No GitHub credentials enabled**

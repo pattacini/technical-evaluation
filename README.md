@@ -12,7 +12,7 @@ If you're not already done with that, you can create the workspace by clicking o
 
 [![Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/pattacini/technical-evaluation)
 
-Remember to visit the [Gitpod Access Control](https://gitpod.io/access-control) to make sure that all GitHub options are ticked in.
+Remember to visit the [Gitpod Integrations](https://gitpod.io/integrations) to make sure that all GitHub options are ticked in.
 
 ##### Notes
 ⚠ This workspace has **No GitHub credentials enabled**

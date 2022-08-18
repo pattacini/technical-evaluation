@@ -1,17 +1,17 @@
-image: pattacini/technical-evaluation-stack:gitpod
+image: ghcr.io/pattacini/technical-evaluation:gitpod
 ports:
 - port: 8080
   onOpen: notify
   visibility: public
 - port: 8888
   onOpen: notify
-  visibility: public  
+  visibility: public
 - port: 5901
   onOpen: notify
-  visibility: public  
+  visibility: public
 - port: 6080
   onOpen: notify
-  visibility: public  
+  visibility: public
 - port: 10000-20000
   onOpen: ignore
 workspaceLocation: "."

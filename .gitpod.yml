@@ -16,12 +16,12 @@ ports:
   onOpen: ignore
 workspaceLocation: "."
 tasks:
-- command: start-markserv.sh
-- command: start-jupyter.sh
-- command: start-vnc-session.sh
 - command: |
     git config --global --unset-all user.name
     git config --global --unset-all user.email
     git config --global --unset-all credential.helper
-    gp open /workspace/technical-evaluation/README.md
+- command: start-markserv.sh
+- command: start-jupyter.sh
+- command: start-vnc-session.sh
+- command: gp open /workspace/technical-evaluation/README.md
 - command: gp url

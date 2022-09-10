@@ -87,7 +87,9 @@ RUN --mount=type=secret,id=HELPERS_REPO_PAT \
     git config --global --remove-section url."https://${HELPERS_REPO_PAT}:@github.com/" && \
     cd audition-projects-helpers && mkdir build && cd build && \
     cmake .. \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DCMAKE_PREFIX_PATH=${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR} \
+    -DCMAKE_INSTALL_PREFIX=${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR} && \
     make install && \
     cd ../.. && rm -Rf audition-projects-helpers
 

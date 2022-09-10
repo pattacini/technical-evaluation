@@ -53,5 +53,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          ROBOTOLOGY_SUPERBUILD_RELEASE=${{ inputs.superbuild_release }}
+          BUILD_TYPE=${{ inputs.build_type }}
         secrets: |
             "HELPERS_REPO_PAT=${{ secrets.PAT_PATTACINI }}"

@@ -12,9 +12,8 @@ RUN apt update
 
 # Install essentials
 RUN apt install -y apt-utils software-properties-common apt-transport-https sudo \
-    psmisc lsb-release tmux nano wget curl telnet gnupg build-essential gdb git gitk \
-    cmake cmake-curses-gui libedit-dev libxml2-dev autoconf locales gdebi terminator meld \
-    dos2unix bash-completion iputils-ping
+    psmisc tmux nano wget curl telnet gnupg gdb git gitk autoconf locales gdebi \
+    terminator meld dos2unix meshlab iputils-ping
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
@@ -56,52 +55,28 @@ RUN git clone https://github.com/novnc/noVNC.git /opt/novnc && \
     git clone https://github.com/novnc/websockify /opt/novnc/utils/websockify && \
     echo "<html><head><meta http-equiv=\"Refresh\" content=\"0; url=vnc.html?autoconnect=true&reconnect=true&reconnect_delay=1000&resize=scale&quality=9\"></head></html>" > /opt/novnc/index.html
 
+# Select options
+ARG ROBOTOLOGY_SUPERBUILD_RELEASE
+ARG BUILD_TYPE
+ARG ROBOTOLOGY_SUPERBUILD_INSTALL_DIR=/robotology-superbuild-install
+
+# Set up git (required by superbuild)
+RUN git config --global user.name "GitHub Actions" && \
+    git config --global user.email "actions@github.com"
+
 # Install dependencies
-RUN apt install -y libeigen3-dev build-essential cmake cmake-curses-gui coinor-libipopt-dev freeglut3-dev \
-    libboost-system-dev libboost-filesystem-dev libboost-thread-dev libtinyxml-dev libsqlite3-dev libace-dev libedit-dev \
-    libgsl0-dev libopencv-dev libode-dev liblua5.1-dev lua5.1 git swig qtbase5-dev qtdeclarative5-dev \
-    qtmultimedia5-dev qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtmultimedia \
-    qml-module-qtquick-dialogs qml-module-qtquick-controls qml-module-qt-labs-folderlistmodel \
-    qml-module-qt-labs-settings libsdl1.2-dev libxml2-dev libv4l-dev
+RUN git clone https://github.com/robotology/robotology-superbuild.git --depth 1 --branch ${ROBOTOLOGY_SUPERBUILD_RELEASE} && \
+    robotology-superbuild/scripts/install_apt_dependencies.sh
 
-# Arguments
-ARG BRANCH=devel
-ARG BUILD_TYPE=Release
-
-# Build ycm
-RUN git clone https://github.com/robotology/ycm.git --depth 1 && \
-    cd ycm && mkdir build && cd build && \
+# Build robotology-superbuild
+RUN cd robotology-superbuild && mkdir build && cd build && \
     cmake .. \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && \
-    make install && \
-    cd ../.. && rm -Rf ycm
-
-# Build robot-testing-framework
-RUN git clone https://github.com/robotology/robot-testing-framework.git --depth 1 --branch ${BRANCH} && \
-    cd robot-testing-framework && mkdir build && cd build && \
-    cmake .. \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && \
-    make install && \
-    cd ../.. && rm -Rf robot-testing-framework
-
-# Build yarp
-RUN git clone https://github.com/robotology/yarp.git --depth 1 && \
-    cd yarp && mkdir build && cd build && \
-    cmake .. \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && \
-    make install && \
-    cd ../.. && rm -Rf yarp
-
-# Build icub-main
-RUN git clone https://github.com/robotology/icub-main.git --depth 1 --branch ${BRANCH} && \
-    cd icub-main && mkdir build && cd build && \
-    cmake .. \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-    -DENABLE_icubmod_cartesiancontrollerserver=ON \
-    -DENABLE_icubmod_cartesiancontrollerclient=ON \
-    -DENABLE_icubmod_gazecontrollerclient=ON && \
-    make install && \
-    cd ../.. && rm -Rf icub-main
+          -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+          -DYCM_EP_INSTALL_DIR=${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR} \
+          -DROBOTOLOGY_ENABLE_CORE:BOOL=ON \
+          -DROBOTOLOGY_ENABLE_ROBOT_TESTING:BOOL=ON && \
+    make && \
+    cd ../.. && rm -Rf robotology-superbuild
 
 # Build audition-projects-helpers
 RUN --mount=type=secret,id=HELPERS_REPO_PAT \
@@ -115,12 +90,12 @@ RUN --mount=type=secret,id=HELPERS_REPO_PAT \
     make install && \
     cd ../.. && rm -Rf audition-projects-helpers
 
+# Clean up git configuration
+RUN git config --global --unset-all user.name && \
+    git config --global --unset-all user.email
+    
 # Set environmental variables
 ENV DISPLAY=:1
-ENV ICUBcontrib_DIR=/workspace/iCubContrib
-ENV YARP_COLORED_OUTPUT=1
-ENV YARP_DATA_DIRS=/usr/local/share/yarp:/usr/local/share/iCub:${ICUBcontrib_DIR}/share/ICUBcontrib
-ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/yarp:/usr/local/lib/robottestingframework:${ICUBcontrib_DIR}/lib
 
 # Create user gitpod
 RUN useradd -l -u 33333 -G sudo -md /home/gitpod -s /bin/bash -p gitpod gitpod && \
@@ -130,30 +105,18 @@ RUN useradd -l -u 33333 -G sudo -md /home/gitpod -s /bin/bash -p gitpod gitpod &
 # Switch to gitpod user
 USER gitpod
 
-# Install Homebrew
-RUN mkdir ~/.cache && sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-ENV PATH="${PATH}:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin/"
-ENV MANPATH="${MANPATH}:/home/linuxbrew/.linuxbrew/share/man"
-ENV INFOPATH="${INFOPATH}:/home/linuxbrew/.linuxbrew/share/info"
-ENV HOMEBREW_NO_AUTO_UPDATE=1
-
 # Install informative git for bash
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1
 
 # Set up .bashrc
-# "/usr/bin" needs to come in the first place within PATH to shadow "/ide/bin/code"
 WORKDIR /home/gitpod
 RUN echo "GIT_PROMPT_ONLY_IN_REPO=1" >> ~/.bashrc && \
     echo "source \${HOME}/.bash-git-prompt/gitprompt.sh" >> ~/.bashrc && \
-    echo "export PATH=/usr/bin:\${PATH}:\${ICUBcontrib_DIR}/bin" >> ~/.bashrc
+    echo "YARP_COLORED_OUTPUT=1" >> ~/.bashrc && \
+    echo "source ${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR}/share/robotology-superbuild/setup.sh" >>  ~/.bashrc
 
 # Switch back to root
 USER root
-
-# Set up script to prepare /workspace/iCubContrib
-COPY init-icubcontrib.sh /usr/bin/init-icubcontrib.sh
-RUN chmod +x /usr/bin/init-icubcontrib.sh && \
-    dos2unix /usr/bin/init-icubcontrib.sh
 
 # Set up script to launch markserv
 COPY start-markserv.sh /usr/bin/start-markserv.sh
@@ -176,7 +139,8 @@ RUN chmod +x "/home/gitpod/Desktop/Visual Studio Code.desktop" && \
     dos2unix "/home/gitpod/Desktop/Visual Studio Code.desktop"
 
 # Make sure specific dirs are owned by gitpod user
-RUN chown -R gitpod.gitpod /home/gitpod/Desktop
+RUN chown -R gitpod.gitpod /home/gitpod/Desktop && \
+    chown -R gitpod.gitpod ${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR}
 
 # Manage ports
 EXPOSE 8080 8888 5901 6080 10000/tcp 10000/udp

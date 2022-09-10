@@ -2,6 +2,19 @@ name: Publish Docker Image
 
 on:
   workflow_dispatch:
+    inputs:
+      superbuild_release:
+        description: 'Robotology Superbuild Release'
+        required: true
+        default: 'master'
+      build_type:
+        type: choice
+        description: 'Build Type'
+        options:
+        - 'Release'
+        - 'Debug'
+        required: true
+        default: 'Release'
 
 env:
   REGISTRY: ghcr.io
@@ -28,6 +41,10 @@ jobs:
       uses: docker/metadata-action@v4.0.1
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        flavor: |
+          latest=auto
+          prefix=
+          suffix=${{ inputs.superbuild_release }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v3.1.1

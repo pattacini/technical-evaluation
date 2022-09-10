@@ -74,7 +74,8 @@ RUN cd robotology-superbuild && mkdir build && cd build && \
           -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
           -DYCM_EP_INSTALL_DIR=${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR} \
           -DROBOTOLOGY_ENABLE_CORE:BOOL=ON \
-          -DROBOTOLOGY_ENABLE_ROBOT_TESTING:BOOL=ON && \
+          -DROBOTOLOGY_ENABLE_ROBOT_TESTING:BOOL=ON \
+          -DROBOTOLOGY_USES_GAZEBO:BOOL=OFF && \
     make && \
     cd ../.. && rm -Rf robotology-superbuild
 

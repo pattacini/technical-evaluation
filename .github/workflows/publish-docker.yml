@@ -51,7 +51,9 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: |
+          ${{ steps.meta.outputs.tags }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.superbuild_release }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
           ROBOTOLOGY_SUPERBUILD_RELEASE=${{ inputs.superbuild_release }}

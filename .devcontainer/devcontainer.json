@@ -1,0 +1,7 @@
+{
+  "name": "Technical Evaluation",
+  "image": "ghcr.io/pattacini/technical-evaluation:gitpod",
+  "extensions": [],
+  "forwardPorts": [8080, 8888, 5901, 6080, 10000],
+  "remoteUser": "gitpod"
+}

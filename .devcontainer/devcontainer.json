@@ -3,5 +3,15 @@
   "image": "ghcr.io/pattacini/technical-evaluation:gitpod",
   "extensions": [],
   "forwardPorts": [8080, 8888, 5901, 6080, 10000],
-  "remoteUser": "gitpod"
+  "remoteUser": "gitpod",
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    }
+  },
+  "postAttachCommand": {
+    "markserver": "start-markserv.sh",
+    "jupyter": "start-jupyter.sh",
+    "vnc": "start-vnc-session.sh"
+  }
 }

@@ -52,7 +52,6 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ steps.meta.outputs.tags }}
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.superbuild_release }}
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gitpod
         labels: ${{ steps.meta.outputs.labels }}

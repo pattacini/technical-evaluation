@@ -52,9 +52,9 @@ jobs:
         context: .
         push: true
         tags: |
+          ${{ steps.meta.outputs.tags }}
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.superbuild_release }}
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gitpod
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
           ROBOTOLOGY_SUPERBUILD_RELEASE=${{ inputs.superbuild_release }}

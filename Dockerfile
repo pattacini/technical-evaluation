@@ -50,7 +50,7 @@ RUN apt install -y nodejs npm && \
 # Install jupyter
 RUN apt install -y python3 python3-dev python3-pip python3-setuptools && \
     if [ ! -f "/usr/bin/python" ]; then ln -s /usr/bin/python3 /usr/bin/python; fi && \
-    pip install ipykernel jupyterlab notebook
+    pip install ipykernel jupyterlab notebook matplotlib
     
 # Install magic-wormwhole to get things from one computer to another safely
 RUN apt install -y magic-wormhole

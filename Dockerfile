@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 LABEL org.opencontainers.image.title="IIT Technical Evaluation Docker Image"
 LABEL org.opencontainers.image.description="Stack of components required to run technical evaluations on Gitpod"
 LABEL org.opencontainers.image.source="https://github.com/pattacini/technical-evaluation"
@@ -47,10 +47,10 @@ RUN apt install -y octave epstool transfig
 RUN apt install -y nodejs npm && \
     npm install --global markserv
 
-# Install jupyter (see https://stackoverflow.com/a/75722775/3956237)
+# Install jupyter
 RUN apt install -y python3 python3-dev python3-pip python3-setuptools && \
     if [ ! -f "/usr/bin/python" ]; then ln -s /usr/bin/python3 /usr/bin/python; fi && \
-    pip install ipykernel jupyterlab notebook matplotlib --break-system-packages
+    pip install ipykernel jupyterlab notebook matplotlib
     
 # Install magic-wormwhole to get things from one computer to another safely
 RUN apt install -y magic-wormhole

@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:latest
 LABEL org.opencontainers.image.title="IIT Technical Evaluation Docker Image"
 LABEL org.opencontainers.image.description="Stack of components required to run technical evaluations on Gitpod"
 LABEL org.opencontainers.image.source="https://github.com/pattacini/technical-evaluation"
@@ -25,7 +25,7 @@ RUN wget -O code.deb https://go.microsoft.com/fwlink/?LinkID=760868 && \
     rm code.deb
 
 # Install graphics
-RUN apt install -y xfce4 xfce4-goodies xserver-xorg-video-dummy xserver-xorg-legacy x11vnc && \
+RUN apt install -y xfce4 xfce4-goodies xserver-xorg-video-dummy xserver-xorg-legacy x11vnc dbus-x11 && \
     apt remove -y xfce4-power-manager xfce4-screensaver light-locker && \
     apt autoremove -y && \
     sed -i 's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
@@ -50,14 +50,13 @@ RUN apt install -y nodejs npm && \
 # Install jupyter
 RUN apt install -y python3 python3-dev python3-pip python3-setuptools && \
     if [ ! -f "/usr/bin/python" ]; then ln -s /usr/bin/python3 /usr/bin/python; fi && \
-    pip install ipykernel jupyterlab notebook matplotlib
+    pip install --break-system-packages ipykernel jupyterlab notebook matplotlib
     
 # Install magic-wormwhole to get things from one computer to another safely
 RUN apt install -y magic-wormhole
 
 # Install noVNC
 RUN git clone https://github.com/novnc/noVNC.git /opt/novnc && \
-    git clone https://github.com/novnc/websockify /opt/novnc/utils/websockify && \
     echo "<html><head><meta http-equiv=\"Refresh\" content=\"0; url=vnc.html?autoconnect=true&reconnect=true&reconnect_delay=1000&resize=scale&quality=9\"></head></html>" > /opt/novnc/index.html
 
 # Select options

@@ -1,0 +1,63 @@
+name: Publish Docker Image for GitHub Codespaces
+
+on:
+  workflow_dispatch:
+    inputs:
+      superbuild_release:
+        description: 'Robotology Superbuild Release'
+        required: true
+        default: 'master'
+      build_type:
+        type: choice
+        description: 'Build Type'
+        options:
+        - 'Release'
+        - 'Debug'
+        required: true
+        default: 'Release'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+        
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository 
+      uses: actions/checkout@main
+      with:
+        ref: 'docker/codespaces'
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2.0.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v4.0.1
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        flavor: |
+          latest=true
+          prefix=
+          suffix=
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v3.1.1
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ steps.meta.outputs.tags }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.superbuild_release }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:codespaces
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          ROBOTOLOGY_SUPERBUILD_RELEASE=${{ inputs.superbuild_release }}
+          BUILD_TYPE=${{ inputs.build_type }}
+        secrets: |
+            "HELPERS_REPO_PAT=${{ secrets.PAT_PATTACINI }}"

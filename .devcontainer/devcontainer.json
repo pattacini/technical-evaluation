@@ -12,5 +12,6 @@
     "markserver": "start-markserv.sh",
     "jupyter": "start-jupyter.sh",
     "vnc": "start-vnc-session.sh"
-  }
+  },
+  "workspaceFolder": "/workspaces"
 }

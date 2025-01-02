@@ -144,9 +144,7 @@ RUN chmod +x /usr/bin/start-vnc-session.sh && \
 # Set up VSCode launcher
 COPY ["Visual Studio Code.desktop", "/home/gitpod/Desktop/Visual Studio Code.desktop"]
 RUN chmod +x "/home/gitpod/Desktop/Visual Studio Code.desktop" && \
-    dos2unix "/home/gitpod/Desktop/Visual Studio Code.desktop" && \
-    gio set -t string "/home/gitpod/Desktop/Visual Studio Code.desktop" metadata::xfce-exe-checksum \
-        "$(sha256sum "/home/gitpod/Desktop/Visual Studio Code.desktop" | awk '{print $1}')"
+    dos2unix "/home/gitpod/Desktop/Visual Studio Code.desktop"
 
 # Make sure specific dirs are owned by gitpod user
 RUN chown -R gitpod.gitpod /home/gitpod/Desktop && \

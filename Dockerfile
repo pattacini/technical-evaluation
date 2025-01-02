@@ -144,7 +144,9 @@ RUN chmod +x /usr/bin/start-vnc-session.sh && \
 # Set up VSCode launcher
 COPY ["Visual Studio Code.desktop", "/home/codespace/Desktop/Visual Studio Code.desktop"]
 RUN chmod +x "/home/codespace/Desktop/Visual Studio Code.desktop" && \
-    dos2unix "/home/codespace/Desktop/Visual Studio Code.desktop"
+    dos2unix "/home/codespace/Desktop/Visual Studio Code.desktop" && \
+    gio set -t string "/home/codespace/Desktop/Visual Studio Code.desktop" metadata::xfce-exe-checksum \
+        "$(sha256sum "/home/codespace/Desktop/Visual Studio Code.desktop" | awk '{print $1}')"
 
 # Make sure specific dirs are owned by codespace user
 RUN chown -R codespace.codespace /home/codespace/Desktop && \

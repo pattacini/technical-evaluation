@@ -4,7 +4,7 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:latest": { }
   },
-  "forwardPorts": [8080, 8888, 5901, 6080, 10000],
+  "forwardPorts": [8080, 8888, 5901, 6080],
   "remoteUser": "codespace",
   "customizations": {
     "codespaces": {

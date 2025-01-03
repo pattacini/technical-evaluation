@@ -11,7 +11,8 @@
   "postAttachCommand": {
     "markserver": "start-markserv.sh",
     "jupyter": "start-jupyter.sh",
-    "vnc": "start-vnc-session.sh"
+    "vnc": "start-vnc-session.sh",
+    "console": "jq -r \".CODESPACE_NAME\" /workspaces/.codespaces/shared/environment-variables.json"
   },
   "workspaceFolder": "/workspaces"
 }

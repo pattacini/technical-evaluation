@@ -1,6 +1,9 @@
 {
   "name": "Technical Evaluation",
   "image": "ghcr.io/pattacini/technical-evaluation:codespaces",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:latest": { }
+  },
   "forwardPorts": [8080, 8888, 5901, 6080, 10000],
   "remoteUser": "codespace",
   "customizations": {

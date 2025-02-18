@@ -6,6 +6,17 @@
     "ghcr.io/devcontainers/features/git-lfs:latest": { }
   },
   "forwardPorts": [8080, 8888, 5901, 6080],
+  "portsAttributes": {
+    "8080": {
+      "label": "markdown"
+    },
+    "8888": {
+      "label": "jupyter"
+    },
+    "6080": {
+      "label": "vnc"
+    }        
+  },
   "remoteUser": "codespace",
   "customizations": {
     "codespaces": {
